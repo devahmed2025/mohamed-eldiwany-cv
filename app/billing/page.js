@@ -3946,7 +3946,7 @@ ${invoiceData.items
           <div style="text-align: right; margin-top: 10px;">
             <h2 style="color: #1f2937; margin: 0 0 5px 0; font-size: 24px;">عرض سعر</h2>
             <p style="color: #6b7280; margin: 5px 0; font-size: 16px;">Nebras Al Arab Printer</p>
-            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">صاحب الشركة: ${companyInfo.owner}</p>
+            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.owner}</p>
           </div>
         </div>
 
@@ -3958,6 +3958,10 @@ ${invoiceData.items
             <p style="margin: 5px 0; color: #6b7280;"><strong>التاريخ:</strong> ${
               invoiceData.date
             }</p>
+
+           <p style="margin: 5px 0;"><strong>رقم الحساب البنكي:</strong> ${companyInfo.bankAccount}</p>
+
+
           </div>
           <div style="text-align: right;">
             <h3 style="color: #1f2937; margin: 0 0 10px 0;">معلومات العميل</h3>
@@ -4059,18 +4063,18 @@ ${invoiceData.items
               <p style="margin: 5px 0;"><strong>رقم الحساب البنكي:</strong> ${companyInfo.bankAccount}</p>
             </div>
           </div>
-          <div style="flex: 1; text-align: left; padding-left: 20px;">
-            <p style="margin: 0; font-size: 10px; color: #6b7280; font-family: monospace;">
-              Bill details and company info for QR code:<br/>
-              Invoice: ${invoiceData.invoiceNumber}<br/>
-              Date: ${invoiceData.date}<br/>
-              Total: ${calculateTotal().toFixed(2)} ريال<br/>
-              Company: ${companyInfo.name}<br/>
-              Owner: ${companyInfo.owner}<br/>
-              Phone: ${companyInfo.phone}<br/>
-              Bank: ${companyInfo.bankAccount}
-            </p>
-          </div>
+          // <div style="flex: 1; text-align: left; padding-left: 20px;">
+          //   <p style="margin: 0; font-size: 10px; color: #6b7280; font-family: monospace;">
+          //     Bill details and company info for QR code:<br/>
+          //     Invoice: ${invoiceData.invoiceNumber}<br/>
+          //     Date: ${invoiceData.date}<br/>
+          //     Total: ${calculateTotal().toFixed(2)} ريال<br/>
+          //     Company: ${companyInfo.name}<br/>
+          //     Owner: ${companyInfo.owner}<br/>
+          //     Phone: ${companyInfo.phone}<br/>
+          //     Bank: ${companyInfo.bankAccount}
+          //   </p>
+          // </div>
         </div>
       </div>
     `;
