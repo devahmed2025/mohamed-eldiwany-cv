@@ -1196,7 +1196,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import QRCode from "qrcode.react";
+import QRCode from 'qrcode';
 
 export default function BillingPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
