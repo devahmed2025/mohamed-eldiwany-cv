@@ -3617,9 +3617,6 @@
 //   );
 // }
 
-
-
-
 "use client";
 import { useState, useEffect } from "react";
 import {
@@ -3660,6 +3657,10 @@ export default function BillingPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isLoved, setIsLoved] = useState(false);
 
+  // New state variables for discount
+  const [discount, setDiscount] = useState(0);
+  const [discountType, setDiscountType] = useState("number"); // 'number' or 'percentage'
+
   // Load social data from localStorage
   useEffect(() => {
     const savedLikes = localStorage.getItem("billingLikes");
@@ -3693,9 +3694,7 @@ export default function BillingPage() {
       },
     ],
   });
-  // START: ADD DISCOUNT FIELD
-  const [discount, setDiscount] = useState(0);
-  // END: ADD DISCOUNT FIELD
+
   const [companyInfo] = useState({
     name: "مطابع نبراس العرب",
     englishName: "Nebras Al Arab Printer",
@@ -3704,9 +3703,7 @@ export default function BillingPage() {
     email: "dewany1979@gmail.com",
     address: "الرياض، المملكة العربية السعودية",
     website: "www.nebras-alarab.com",
-    // START: ADD BANK ACCOUNT
-    bankAccount: "1234567890123456789012S",
-    // END: ADD BANK ACCOUNT
+    bankAccount: "SA1234567890123456789012",
   });
 
   // Check authentication on component mount
@@ -3872,20 +3869,30 @@ export default function BillingPage() {
   const calculateSubtotal = () => {
     return invoiceData.items.reduce((sum, item) => sum + item.total, 0);
   };
+
   const calculateTax = () => {
     return calculateSubtotal() * 0.15;
   };
-  // START: UPDATE TOTAL TO INCLUDE DISCOUNT
-  const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax() - discount;
+
+  const calculateDiscountAmount = () => {
+    if (discountType === "percentage") {
+      return calculateSubtotal() * (discount / 100);
+    }
+    return discount;
   };
-  // END: UPDATE TOTAL TO INCLUDE DISCOUNT
+
+  const calculateTotal = () => {
+    const totalBeforeDiscount = calculateSubtotal() + calculateTax();
+    const finalTotal = totalBeforeDiscount - calculateDiscountAmount();
+    return Math.max(0, finalTotal); // Ensure total is not negative
+  };
 
   const saveInvoice = () => {
     const invoiceToSave = {
       ...invoiceData,
       subtotal: calculateSubtotal(),
       tax: calculateTax(),
+      discount: calculateDiscountAmount(),
       total: calculateTotal(),
       companyInfo,
     };
@@ -3912,7 +3919,10 @@ ${invoiceData.items
   )
   .join("\n")}
 
-المجموع: ${calculateTotal().toFixed(2)} ريال
+المجموع الفرعي: ${calculateSubtotal().toFixed(2)} ريال
+الضريبة (15%): ${calculateTax().toFixed(2)} ريال
+الخصم: ${calculateDiscountAmount().toFixed(2)} ريال
+الإجمالي: ${calculateTotal().toFixed(2)} ريال
 
 رقم الفاتورة: ${invoiceData.invoiceNumber}`;
     const whatsappUrl = `https://wa.me/${companyInfo.phone.replace(
@@ -3922,272 +3932,203 @@ ${invoiceData.items
     window.open(whatsappUrl, "_blank");
   };
 
-  const generateCompanyInfoQrCode = async () => {
-    const qrText = `
-      معلومات الشركة:
-      الاسم: ${companyInfo.name}
-      الاسم بالإنجليزية: ${companyInfo.englishName}
-      المالك: ${companyInfo.owner}
-      الهاتف: ${companyInfo.phone}
-      البريد الإلكتروني: ${companyInfo.email}
-      الموقع: ${companyInfo.website}
-      العنوان: ${companyInfo.address}
-      رقم الحساب البنكي: ${companyInfo.bankAccount}
-    `;
-    try {
-      const qrDataUri = await QRCode.toDataURL(qrText, {
-        errorCorrectionLevel: 'H'
-      });
-      return qrDataUri;
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
-  };
-
-
   const generateAndSendPDF = async () => {
-    const qrCodeImage = await generateCompanyInfoQrCode();
+    const finalTotal = calculateTotal();
+    const subtotal = calculateSubtotal();
+    const tax = calculateTax();
+    const discountAmount = calculateDiscountAmount();
+    const qrText = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; text-align: right; direction: rtl;">
+          <h1 style="color: #10b981;">تفاصيل الفاتورة</h1>
+          <p><strong>اسم الشركة:</strong> ${companyInfo.name}</p>
+          <p><strong>رقم الفاتورة:</strong> ${invoiceData.invoiceNumber}</p>
+          <p><strong>اسم العميل:</strong> ${invoiceData.customerName || "غير محدد"}</p>
+          <p><strong>المجموع الفرعي:</strong> ${subtotal.toFixed(2)} ريال</p>
+          <p><strong>الضريبة (15%):</strong> ${tax.toFixed(2)} ريال</p>
+          <p><strong>الخصم:</strong> ${discountAmount.toFixed(2)} ريال</p>
+          <h3 style="color: #10b981;">الإجمالي: ${finalTotal.toFixed(2)} ريال</h3>
+          <p><strong>رقم الحساب المصرفي:</strong> ${companyInfo.bankAccount}</p>
+          <p style="margin-top: 20px; font-style: italic;">هذه الفاتورة صالحة لمدة 30 يومًا من تاريخ الإصدار.</p>
+        </div>
+      `;
+
+    // Generate QR code with HTML content as data
+    const qrCodeUrl = await QRCode.toDataURL(qrText, { errorCorrectionLevel: 'H', width: 200 });
+
+    // Create invoice content for PDF
     const invoiceContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; direction: rtl; text-align: right;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #10b981; padding-bottom: 20px;">
+          <div style="flex-shrink: 0;">
+            <img src="/dwn/Logo.svg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 10px;">
+          </div>
+          <div style="text-align: right;">
+            <h1 style="color: #10b981; margin: 0; font-size: 28px;">مطابع نبراس العرب</h1>
+            <p style="color: #6b7280; margin: 5px 0; font-size: 16px;">Nebras Al Arab Printer</p>
+            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">محمد الديواني</p>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+          <div>
+            <h2 style="color: #1f2937; margin: 0 0 10px 0; font-size: 24px;">عرض سعر</h2>
+            <p style="margin: 5px 0; color: #6b7280;"><strong>رقم العرض:</strong> ${
+              invoiceData.invoiceNumber
+            }</p>
+            <p style="margin: 5px 0; color: #6b7280;"><strong>التاريخ:</strong> ${
+              invoiceData.date
+            }</p>
+          </div>
+          <div style="text-align: left;">
+            <h3 style="color: #1f2937; margin: 0 0 10px 0;">معلومات العميل</h3>
+            <p style="margin: 5px 0; color: #6b7280;"><strong>الاسم:</strong> ${
+              invoiceData.customerName || customerName || "غير محدد"
+            }</p>
+            <p style="margin: 5px 0; color: #6b7280;"><strong>العنوان:</strong> ${
+              invoiceData.customerAddress || customerAddress || "غير محدد"
+            }</p>
+            <p style="margin: 5px 0; color: #6b7280;"><strong>الهاتف:</strong> ${
+              invoiceData.customerPhone || "غير محدد"
+            }</p>
+            <p style="margin: 5px 0; color: #6b7280;"><strong>البريد:</strong> ${
+              invoiceData.customerEmail || "غير محدد"
+            }</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #1f2937; margin: 0 0 15px 0;">المنتجات</h3>
+          <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
+            <thead>
+              <tr style="background-color: #f9fafb;">
+                <th style="border: 1px solid #e5e7eb; padding: 12px; text-align: right; color: #1f2937;">المنتج</th>
+                <th style="border: 1px solid #e5e7eb; padding: 12px; text-align: center; color: #1f2937;">الكمية</th>
+                <th style="border: 1px solid #e5e7eb; padding: 12px; text-align: center; color: #1f2937;">السعر</th>
+                <th style="border: 1px solid #e5e7eb; padding: 12px; text-align: center; color: #1f2937;">الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${invoiceData.items
+                .map(
+                  (item) => `
+                <tr>
+                  <td style="border: 1px solid #e5e7eb; padding: 12px; text-align: right; color: #374151;">${
+                    item.name || "غير محدد"
+                  }</td>
+                  <td style="border: 1px solid #e5e7eb; padding: 12px; text-align: center; color: #374151;">${
+                    item.quantity
+                  }</td>
+                  <td style="border: 1px solid #e5e7eb; padding: 12px; text-align: center; color: #374151;">${item.price.toFixed(
+                    2
+                  )} ريال</td>
+                  <td style="border: 1px solid #e5e7eb; padding: 12px; text-align: center; color: #374151;">${item.total.toFixed(
+                    2
+                  )} ريال</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="text-align: left; margin-bottom: 30px;">
+          <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="color: #6b7280;">المجموع الفرعي:</span>
+              <span style="color: #1f2937; font-weight: bold;">${calculateSubtotal().toFixed(
+                2
+              )} ريال</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="color: #6b7280;">الضريبة (15%):</span>
+              <span style="color: #1f2937; font-weight: bold;">${calculateTax().toFixed(
+                2
+              )} ريال</span>
+            </div>
+             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px;">
+              <span style="color: #6b7280;">الخصم:</span>
+              <span style="color: #1f2937; font-weight: bold;">${calculateDiscountAmount().toFixed(2)} ريال</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 10px;">
+              <span style="color: #1f2937; font-weight: bold; font-size: 18px;">الإجمالي:</span>
+              <span style="color: #10b981; font-weight: bold; font-size: 18px;">${calculateTotal().toFixed(
+                2
+              )} ريال</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px;">
+           <div style="text-align: right; flex-grow: 1;">
+              <h4 style="color: #1f2937; margin: 0 0 15px 0;">معلومات الشركة</h4>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>الهاتف:</strong> ${companyInfo.phone}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>البريد الإلكتروني:</strong> ${companyInfo.email}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>الموقع:</strong> ${companyInfo.website}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>العنوان:</strong> ${companyInfo.address}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>رقم الحساب المصرفي:</strong> ${companyInfo.bankAccount}</p>
+           </div>
+           <div style="flex-shrink: 0; text-align: center;">
+              <img src="${qrCodeUrl}" alt="QR Code" style="width: 150px; height: 150px; border: 1px solid #ccc; padding: 5px; border-radius: 5px;"/>
+              <p style="color: #6b7280; font-size: 12px; margin-top: 5px;">امسح لعرض الفاتورة على الويب</p>
+           </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
+          <p>شكراً لاختياركم مطابع نبراس العرب</p>
+          <p>Thank you for choosing Nebras Al Arab Printer</p>
+        </div>
+      </div>
+    `;
+
+    // Create a new window with the invoice content
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
       <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
+      <html dir="rtl">
         <head>
           <title>عرض سعر - ${invoiceData.invoiceNumber}</title>
           <meta charset="utf-8">
           <style>
-            body { 
-              font-family: 'Arial', sans-serif;
-              direction: rtl;
-              margin: 0;
-              padding: 40px;
-              background-color: #f7fafc;
-              color: #1f2937;
-            }
-            .invoice-container {
-              max-width: 800px;
-              margin: 0 auto;
-              background-color: #ffffff;
-              border-radius: 12px;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-            }
-            .header {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: 30px;
-              border-bottom: 2px solid #10b981;
-            }
-            .header img {
-              width: 80px;
-              height: 80px;
-            }
-            .header-info {
-              text-align: right;
-            }
-            .header-info h1 {
-              font-size: 28px;
-              font-weight: bold;
-              color: #10b981;
-              margin: 0;
-            }
-            .header-info p {
-              margin: 0;
-              color: #4b5563;
-              font-size: 14px;
-            }
-            .invoice-details {
-              padding: 30px;
-              display: flex;
-              justify-content: space-between;
-              border-bottom: 1px solid #e5e7eb;
-            }
-            .invoice-details h2 {
-              font-size: 24px;
-              font-weight: bold;
-              margin-bottom: 10px;
-            }
-            .invoice-details p {
-              margin: 5px 0;
-              color: #4b5563;
-              font-size: 14px;
-            }
-            .customer-info {
-              text-align: left;
-            }
-            .qr-code-section {
-              text-align: center;
-              padding: 30px;
-              border-bottom: 1px solid #e5e7eb;
-            }
-            .qr-code-section h3 {
-              font-size: 18px;
-              font-weight: bold;
-              margin-bottom: 15px;
-            }
-            .qr-code-section img {
-              width: 150px;
-              height: 150px;
-              border: 1px solid #e5e7eb;
-              padding: 5px;
-              border-radius: 8px;
-            }
-            .items-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 30px;
-            }
-            .items-table th, .items-table td {
-              border: 1px solid #e5e7eb;
-              padding: 12px;
-              text-align: right;
-            }
-            .items-table th {
-              background-color: #f3f4f6;
-              color: #374151;
-              font-weight: bold;
-            }
-            .totals-section {
-              padding: 30px;
-              text-align: left;
-            }
-            .totals-container {
-              background-color: #f9fafb;
-              padding: 20px;
-              border-radius: 8px;
-            }
-            .total-row {
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 10px;
-            }
-            .total-row:last-child {
-              margin-bottom: 0;
-              font-size: 18px;
-              font-weight: bold;
-              color: #10b981;
-              border-top: 1px solid #e5e7eb;
-              padding-top: 10px;
-            }
-            .footer {
-              text-align: center;
-              padding: 20px;
-              border-top: 1px solid #e5e7eb;
-              color: #9ca3af;
-              font-size: 12px;
-            }
+            body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
             @media print {
-              body {
-                background-color: #ffffff;
-                padding: 0;
-              }
-              .invoice-container {
-                box-shadow: none;
-                border-radius: 0;
-              }
-              .no-print {
-                display: none;
-              }
+              body { margin: 0; }
+              .no-print { display: none; }
             }
           </style>
         </head>
         <body>
-          <div class="invoice-container">
-            <div class="header">
-              <img src="/dwn/Logo.svg" alt="Logo">
-              <div class="header-info">
-                <h1>مطابع نبراس العرب</h1>
-                <p>Nebras Al Arab Printer</p>
-                <p>محمد الديواني</p>
-              </div>
-            </div>
-
-            <div class="invoice-details">
-              <div>
-                <h2>عرض سعر</h2>
-                <p><strong>رقم العرض:</strong> ${invoiceData.invoiceNumber}</p>
-                <p><strong>التاريخ:</strong> ${invoiceData.date}</p>
-              </div>
-              <div class="customer-info">
-                <h3>معلومات العميل</h3>
-                <p><strong>الاسم:</strong> ${
-                  invoiceData.customerName || customerName || "غير محدد"
-                }</p>
-                <p><strong>العنوان:</strong> ${
-                  invoiceData.customerAddress || customerAddress || "غير محدد"
-                }</p>
-                <p><strong>الهاتف:</strong> ${
-                  invoiceData.customerPhone || "غير محدد"
-                }</p>
-                <p><strong>البريد:</strong> ${
-                  invoiceData.customerEmail || "غير محدد"
-                }</p>
-              </div>
-            </div>
-            
-            <div class="qr-code-section">
-                <h3>تفاصيل الشركة (امسح الرمز)</h3>
-                ${qrCodeImage ? `<img src="${qrCodeImage}" alt="Company Info QR Code"/>` : `<p>Failed to generate QR Code</p>`}
-            </div>
-
-            <table class="items-table">
-              <thead>
-                <tr>
-                  <th>المنتج</th>
-                  <th>الكمية</th>
-                  <th>السعر</th>
-                  <th>الإجمالي</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${invoiceData.items
-                  .map(
-                    (item) => `
-                  <tr>
-                    <td>${item.name || "غير محدد"}</td>
-                    <td style="text-align: center;">${item.quantity}</td>
-                    <td style="text-align: center;">${item.price.toFixed(2)} ريال</td>
-                    <td style="text-align: center;">${item.total.toFixed(2)} ريال</td>
-                  </tr>
-                `
-                  )
-                  .join("")}
-              </tbody>
-            </table>
-
-            <div class="totals-section">
-              <div class="totals-container">
-                <div class="total-row">
-                  <span>المجموع الفرعي:</span>
-                  <span>${calculateSubtotal().toFixed(2)} ريال</span>
-                </div>
-                <div class="total-row">
-                  <span>الضريبة (15%):</span>
-                  <span>${calculateTax().toFixed(2)} ريال</span>
-                </div>
-                <div class="total-row">
-                  <span>الخصم:</span>
-                  <span>${discount.toFixed(2)} ريال</span>
-                </div>
-                <div class="total-row">
-                  <span>الإجمالي:</span>
-                  <span>${calculateTotal().toFixed(2)} ريال</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="footer">
-              <p>شكراً لاختياركم مطابع نبراس العرب</p>
-              <p>Thank you for choosing Nebras Al Arab Printer</p>
-            </div>
+          ${invoiceContent}
+          <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button onclick="window.print()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 0 10px;">
+              طباعة PDF
+            </button>
+            <button onclick="window.close()" style="background: #6b7280; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 0 10px;">
+              إغلاق
+            </button>
           </div>
         </body>
       </html>
-    `;
-
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(invoiceContent);
+    `);
     printWindow.document.close();
+
+    // After a short delay, send WhatsApp message with PDF info
+    setTimeout(() => {
+      const pdfMessage = `مرحباً، تم إنشاء عرض سعر كامل
+
+رقم العرض: ${invoiceData.invoiceNumber}
+اسم العميل: ${customerName || "غير محدد"}
+المجموع: ${finalTotal.toFixed(2)} ريال
+
+تم إنشاء PDF كامل للعرض مع جميع التفاصيل.
+يمكنك طباعته أو حفظه كملف PDF.`;
+
+      const whatsappUrl = `https://wa.me/${companyInfo.phone.replace(
+        /\D/g,
+        ""
+      )}?text=${encodeURIComponent(pdfMessage)}`;
+      window.open(whatsappUrl, "_blank");
+    }, 1000);
   };
 
   const handleLike = () => {
@@ -4568,11 +4509,9 @@ ${invoiceData.items
                       onClick={addItem}
                       className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
-                      <Plus size={16} />
-                      إضافة منتج
+                      <Plus size={16} /> إضافة منتج
                     </button>
                   </div>
-
                   <div className="space-y-4">
                     {invoiceData.items.map((item, index) => (
                       <div
@@ -4666,19 +4605,53 @@ ${invoiceData.items
                       <span>الضريبة (15%):</span>
                       <span>{calculateTax().toFixed(2)} ريال</span>
                     </div>
-                    {/* START: ADD DISCOUNT INPUT */}
-                    <div className="flex justify-between items-center text-gray-600">
-                      <span>الخصم:</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={discount}
-                        onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                        className="px-2 py-1 w-24 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800 bg-white"
-                      />
+
+                    {/* New Discount Input */}
+                    <div className="flex justify-between items-center text-gray-600 border-t pt-2">
+                      <div className="flex items-center gap-2">
+                        <span>الخصم:</span>
+                        <div className="flex space-x-2">
+                          <label className="flex items-center gap-1">
+                            <input
+                              type="radio"
+                              name="discountType"
+                              value="number"
+                              checked={discountType === "number"}
+                              onChange={(e) => setDiscountType(e.target.value)}
+                              className="form-radio text-primary-600"
+                            />
+                            <span>رقم</span>
+                          </label>
+                          <label className="flex items-center gap-1">
+                            <input
+                              type="radio"
+                              name="discountType"
+                              value="percentage"
+                              checked={discountType === "percentage"}
+                              onChange={(e) => setDiscountType(e.target.value)}
+                              className="form-radio text-primary-600"
+                            />
+                            <span>نسبة مئوية</span>
+                          </label>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={discount}
+                          onChange={(e) =>
+                            setDiscount(parseFloat(e.target.value) || 0)
+                          }
+                          className="w-24 text-right px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800"
+                        />
+                        <span className="text-sm">
+                          {discountType === "percentage" ? "%" : "ريال"}
+                        </span>
+                      </div>
                     </div>
-                    {/* END: ADD DISCOUNT INPUT */}
+
                     <div className="flex justify-between text-lg font-bold text-gray-800 border-t pt-2">
                       <span>الإجمالي:</span>
                       <span>{calculateTotal().toFixed(2)} ريال</span>
@@ -4688,46 +4661,92 @@ ${invoiceData.items
               </div>
             </div>
 
-            {/* Action Buttons */}
-            {/* START: REMOVE COMPANY INFO BLOCK */}
+            {/* Company Info & Actions */}
             <div className="space-y-6">
-              {/* END: REMOVE COMPANY INFO BLOCK */}
+              {/* Company Information */}
+              <div className="bg-white rounded-2xl shadow-xl p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                  <div className="w-6 h-6 bg-gradient-secondary rounded-lg flex items-center justify-center">
+                    <span className="text-white text-sm">🏢</span>
+                  </div>
+                  معلومات الشركة
+                </h3>
+                <div className="space-y-3">
+                  <div className="text-center">
+                    <h4 className="text-lg font-bold text-primary-600 mb-1 arabic-font-bold">
+                      {companyInfo.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {companyInfo.englishName}
+                    </p>
+                    <p className="text-sm text-gray-700 font-medium">
+                      {companyInfo.owner}
+                    </p>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">📞</span>
+                      <span className="text-gray-800 font-medium">
+                        {companyInfo.phone}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">✉️</span>
+                      <span className="text-gray-800 font-medium">
+                        {companyInfo.email}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">🌐</span>
+                      <span className="text-gray-800 font-medium">
+                        {companyInfo.website}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">📍</span>
+                      <span className="text-gray-800 font-medium arabic-font">
+                        {companyInfo.address}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">🏦</span>
+                      <span className="text-gray-800 font-medium arabic-font">
+                        {companyInfo.bankAccount}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
               <div className="bg-white rounded-2xl shadow-xl p-6">
                 <h3 className="text-xl font-bold text-gray-800 mb-4">
                   الإجراءات
                 </h3>
-
                 <div className="space-y-3">
                   <button
                     onClick={sendWhatsApp}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-medium"
                   >
-                    <Send size={18} />
-                    إرسال عبر واتساب
+                    <Send size={18} /> إرسال عبر واتساب
                   </button>
-
                   <button
                     onClick={generateAndSendPDF}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium"
                   >
-                    <Download size={18} />
-                    تحميل وإرسال PDF
+                    <Download size={18} /> تحميل وإرسال PDF
                   </button>
-
                   <button
                     onClick={() => window.print()}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-secondary text-white rounded-lg hover:shadow-lg transition-all duration-200 font-medium"
                   >
-                    <Printer size={18} />
-                    طباعة العرض
+                    <Printer size={18} /> طباعة العرض
                   </button>
-
                   <button
                     onClick={saveInvoice}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-accent text-white rounded-lg hover:shadow-lg transition-all duration-200 font-medium"
                   >
-                    <Save size={18} />
-                    حفظ كملف
+                    <Save size={18} /> حفظ كملف
                   </button>
                 </div>
               </div>
@@ -4751,7 +4770,6 @@ ${invoiceData.items
                 <X size={24} />
               </button>
             </div>
-
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -4762,26 +4780,34 @@ ${invoiceData.items
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800 bg-white"
-                  placeholder="أدخل اسمك"
+                  placeholder="أدخل اسم العميل"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   العنوان
                 </label>
-                <textarea
+                <input
+                  type="text"
                   value={customerAddress}
                   onChange={(e) => setCustomerAddress(e.target.value)}
-                  rows="3"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800 bg-white"
-                  placeholder="أدخل عنوانك"
+                  placeholder="أدخل عنوان العميل"
                 />
               </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={saveCustomerInfo}
-                className="w-full bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                className="bg-primary-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors"
               >
-                حفظ البيانات
+                حفظ
+              </button>
+              <button
+                onClick={() => setShowCustomerModal(false)}
+                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+              >
+                إلغاء
               </button>
             </div>
           </div>
@@ -4791,10 +4817,10 @@ ${invoiceData.items
       {/* Social Modal */}
       {showSocialModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800">
-                التعليقات والتفاعل
+                تعليقات ومشاركات
               </h3>
               <button
                 onClick={() => setShowSocialModal(false)}
@@ -4803,15 +4829,14 @@ ${invoiceData.items
                 <X size={24} />
               </button>
             </div>
-
             <div className="space-y-4">
-              {/* Add Comment */}
-              <div className="flex gap-2">
+              {/* New Comment Input */}
+              <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800 bg-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800 bg-white"
                   placeholder="أضف تعليقك هنا..."
                   onKeyPress={(e) => e.key === "Enter" && addComment()}
                 />
@@ -4851,3 +4876,5 @@ ${invoiceData.items
     </div>
   );
 }
+
+
