@@ -4063,18 +4063,7 @@ ${invoiceData.items
               <p style="margin: 5px 0;"><strong>رقم الحساب البنكي:</strong> ${companyInfo.bankAccount}</p>
             </div>
           </div>
-          // <div style="flex: 1; text-align: left; padding-left: 20px;">
-          //   <p style="margin: 0; font-size: 10px; color: #6b7280; font-family: monospace;">
-          //     Bill details and company info for QR code:<br/>
-          //     Invoice: ${invoiceData.invoiceNumber}<br/>
-          //     Date: ${invoiceData.date}<br/>
-          //     Total: ${calculateTotal().toFixed(2)} ريال<br/>
-          //     Company: ${companyInfo.name}<br/>
-          //     Owner: ${companyInfo.owner}<br/>
-          //     Phone: ${companyInfo.phone}<br/>
-          //     Bank: ${companyInfo.bankAccount}
-          //   </p>
-          // </div>
+         
         </div>
       </div>
     `;
