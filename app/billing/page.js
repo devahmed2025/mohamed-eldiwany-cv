@@ -353,7 +353,7 @@ export default function BillingPage() {
   };
 
   const sendWhatsApp = () => {
-    const message = `مرحباً، أريد عرض سعر من مطابع نبراس العرب
+    const message = `عرض سعر
     
 اسم العميل: ${customerName || "غير محدد"}
 
@@ -376,68 +376,240 @@ ${invoiceData.items
     window.open(whatsappUrl, "_blank");
   };
 
+  // const generateAndDownloadPDF = async () => {
+  //   // Create invoice content for PDF
+  //   const billText = `عرض: ${invoiceData.invoiceNumber}\nتاريخ: ${invoiceData.date}\nعميل: ${invoiceData.customerName || customerName || "غير محدد"}\n` +
+  //     invoiceData.items.map((i, idx) => `${idx + 1}) ${i.name || "-"} | ${i.quantity} x ${i.price} = ${i.total}`).join("\n") +
+  //     `\nإجمالي: ${calculateTotal().toFixed(2)} ريال`;
+  //   let qrDataURL = "";
+  //   try {
+  //     qrDataURL = await QRCode.toDataURL(billText, { width: 120, margin: 1 });
+  //   } catch {}
+
+  //   const invoiceContent = `
+  //     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+  //       <div style="position: relative;">
+  //         ${watermarkEnabled ? '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0.05; z-index:0;"><img src="/dwn/Logo.svg" style="max-width:500px; width:70%; transform: translateY(40%);"/></div>' : ''}
+  //         <div style="position:relative; z-index:1; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 2px solid #10b981; padding-bottom: 20px;">
+  //           <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
+  //             <img src="/dwn/Logo.svg" alt="Logo" style="width: 80px; height: 80px;">
+  //             <h1 style="color: #10b981; margin: 0; font-size: 20px;">مطابع نبراس العرب</h1>
+  //           </div>
+  //           <div style="text-align: center; margin-top: 0;">
+  //           ${qrDataURL ? `<img src="${qrDataURL}" alt="QR" style="width: 100px; height: 100px;">` : ""}
+  //           </div>
+  //           <div style="text-align: right; margin-top: 6px;">
+  //           <h2 style="color: #1f2937; margin: 0 0 5px 0; font-size: 24px;">عرض سعر</h2>
+  //           <p style="color: #6b7280; margin: 5px 0; font-size: 16px;">Nebras Al Arab Printer</p>
+  //           <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.owner}</p>
+  //           <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.IBAN}</p>
+  //           <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.bankAccount}</p>
+
+
+  //           </div>
+  //         </div>
+  //       </div>
+
+  //       <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+  //         <div>
+  //           <p style="margin: 5px 0; color: #6b7280;"><strong>رقم العرض:</strong> ${
+  //             invoiceData.invoiceNumber
+  //           }</p>
+  //           <p style="margin: 5px 0; color: #6b7280;"><strong>التاريخ:</strong> ${
+  //             invoiceData.date
+  //           }</p>
+
+  //          <p style="margin: 5px 0;"><strong>الراجحي</strong> ${companyInfo.bankAccount}</p>
+  //          <p style="margin: 5px 0;"><strong>IBAN</strong> ${companyInfo.IBAN}</p>
+
+
+
+  //         </div>
+  //         <div style="text-align: right;">
+  //           <h3 style="color: #1f2937; margin: 0 0 10px 0;">معلومات العميل</h3>
+  //           <p style="margin: 5px 0; color: #6b7280;"><strong>الاسم:</strong> ${
+  //             invoiceData.customerName || customerName || "غير محدد"
+  //           }</p>
+       
+  //           <p style="margin: 5px 0; color: #6b7280;"><strong>الهاتف:</strong> ${
+  //             invoiceData.customerPhone || "غير محدد"
+  //           }</p>
+         
+  //         </div>
+  //       </div>
+
+  //       <div style="margin-bottom: 20px;">
+  //         <h3 style="color: #1f2937; margin: 0 0 15px 0;">المنتجات</h3>
+  //         <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
+  //           <thead>
+  //             <tr style="background-color: #f9fafb;">
+  //               <th style="border: 1px solid #e5e7eb; padding: 6px; text-align: right; color: #1f2937;">المنتج</th>
+  //               <th style="border: 1px solid #e5e7eb; padding: 6px; text-align: center; color: #1f2937;">الكمية</th>
+  //               <th style="border: 1px solid #e5e7eb; padding: 6px; text-align: center; color: #1f2937;">السعر</th>
+  //               <th style="border: 1px solid #e5e7eb; padding: 6px; text-align: center; color: #1f2937;">الإجمالي</th>
+  //             </tr>
+  //           </thead>
+  //           <tbody>
+  //             ${invoiceData.items
+  //               .map(
+  //                 (item) => `
+  //               <tr>
+  //                 <td style="border: 1px solid #e5e7eb; padding: 6px; text-align: right; color: #374151;">${
+  //                   item.name || "غير محدد"
+  //                 }</td>
+  //                 <td style="border: 1px solid #e5e7eb; padding: 6px; text-align: center; color: #374151;">${
+  //                   item.quantity
+  //                 }</td>
+  //                 <td style="border: 1px solid #e5e7eb; padding: 6px; text-align: center; color: #374151;">${item.price.toFixed(
+  //                   2
+  //                 )} ريال</td>
+  //                 <td style="border: 1px solid #e5e7eb; padding: 6px; text-align: center; color: #374151;">${item.total.toFixed(
+  //                   2
+  //                 )} ريال</td>
+  //               </tr>
+  //               `
+  //               )
+  //               .join("")}
+  //           </tbody>
+  //         </table>
+  //       </div>
+
+  //       <div style="text-align: left; margin-bottom: 20px;">
+  //         <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px;">
+  //           <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+  //             <span style="color: #6b7280;">المجموع الفرعي:</span>
+  //             <span style="color: #1f2937; font-weight: bold;">${calculateSubtotal().toFixed(
+  //               2
+  //             )} ريال</span>
+  //           </div>
+  //           <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+  //             <span style="color: #6b7280;">الخصم:</span>
+  //             <span style="color: #1f2937; font-weight: bold;">-${calculateDiscountAmount().toFixed(
+  //               2
+  //             )} ريال</span>
+  //           </div>
+  //           <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+  //             <span style="color: #6b7280;">المجموع قبل الضريبة:</span>
+  //             <span style="color: #1f2937; font-weight: bold;">${calculateTaxableAmount().toFixed(
+  //               2
+  //             )} ريال</span>
+  //           </div>
+  //           <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+  //             <span style="color: #6b7280;">الضريبة (15%):</span>
+  //             <span style="color: #1f2937; font-weight: bold;">${calculateTax().toFixed(
+  //               2
+  //             )} ريال</span>
+  //           </div>
+  //           <div style="display: flex; justify-content: space-between; border-top: 1px solid #e5e7eb; padding-top: 10px;">
+  //             <span style="color: #1f2937; font-weight: bold; font-size: 18px;">الإجمالي:</span>
+  //             <span style="color: #10b981; font-weight: bold; font-size: 18px;">${calculateTotal().toFixed(
+  //               2
+  //             )} ريال</span>
+  //           </div>
+  //         </div>
+  //       </div>
+
+        
+  //     </div>
+  //   `;
+
+  //   // Create a new window with the invoice content
+  //   const printWindow = window.open("", "_blank");
+  //   printWindow.document.write(`
+  //     <!DOCTYPE html>
+  //     <html dir="rtl">
+  //       <head>
+  //         <title>عرض سعر - ${invoiceData.invoiceNumber}</title>
+  //         <meta charset="utf-8">
+  //         <style>
+  //           body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+  //           @media print {
+  //             body { margin: 0; }
+  //             .no-print { display: none; }
+  //             table, tbody, tr, td { page-break-inside: avoid !important; }
+  //           }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         ${invoiceContent}
+  //         <div class="no-print" style="text-align: center; margin-top: 30px;">
+  //           <button onclick="window.print()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 0 10px;">
+  //             طباعة PDF
+  //           </button>
+  //           <button onclick="window.close()" style="background: #6b7280; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 0 10px;">
+  //             إغلاق
+  //           </button>
+  //         </div>
+  //       </body>
+  //     </html>
+  //   `);
+  //   printWindow.document.close();
+  // };
+
   const generateAndDownloadPDF = async () => {
-    // Create invoice content for PDF
-    const billText = `عرض: ${invoiceData.invoiceNumber}\nتاريخ: ${invoiceData.date}\nعميل: ${invoiceData.customerName || customerName || "غير محدد"}\n` +
-      invoiceData.items.map((i, idx) => `${idx + 1}) ${i.name || "-"} | ${i.quantity} x ${i.price} = ${i.total}`).join("\n") +
-      `\nإجمالي: ${calculateTotal().toFixed(2)} ريال`;
+    // Create invoice content for PDF + QR
+const billText =
+  `عرض: ${invoiceData.invoiceNumber}\n` +
+  `تاريخ: ${invoiceData.date}\n` +
+  `عميل: ${invoiceData.customerName || customerName || "غير محدد"}\n\n` +
+  `المنتجات:\n` +
+  invoiceData.items
+    .map((i, idx) => {
+      const name = (i.name || "-").padEnd(10, " ");
+      return `${idx + 1}) ${name} ${i.quantity} x ${i.price} = ${i.total}`;
+    })
+    .join("\n") +
+  `\n\nإجمالي: ${calculateTotal().toFixed(2)} ريال\n` +
+  `الراجحي: 129608010999395\n` +
+  `IBAN: SA5480000129608010999395`;
+
     let qrDataURL = "";
     try {
       qrDataURL = await QRCode.toDataURL(billText, { width: 120, margin: 1 });
     } catch {}
-
+  
     const invoiceContent = `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
         <div style="position: relative;">
-          ${watermarkEnabled ? '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0.05; z-index:0;"><img src="/dwn/Logo.svg" style="max-width:500px; width:70%; transform: translateY(40%);"/></div>' : ''}
+          ${
+            watermarkEnabled
+              ? '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0.05; z-index:0;"><img src="/dwn/Logo.svg" style="max-width:500px; width:70%; transform: translateY(40%);"/></div>'
+              : ""
+          }
           <div style="position:relative; z-index:1; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 2px solid #10b981; padding-bottom: 20px;">
             <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
               <img src="/dwn/Logo.svg" alt="Logo" style="width: 80px; height: 80px;">
               <h1 style="color: #10b981; margin: 0; font-size: 20px;">مطابع نبراس العرب</h1>
             </div>
             <div style="text-align: center; margin-top: 0;">
-            ${qrDataURL ? `<img src="${qrDataURL}" alt="QR" style="width: 100px; height: 100px;">` : ""}
+              ${qrDataURL ? `<img src="${qrDataURL}" alt="QR" style="width: 100px; height: 100px;">` : ""}
             </div>
             <div style="text-align: right; margin-top: 6px;">
-            <h2 style="color: #1f2937; margin: 0 0 5px 0; font-size: 24px;">عرض سعر</h2>
-            <p style="color: #6b7280; margin: 5px 0; font-size: 16px;">Nebras Al Arab Printer</p>
-            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.owner}</p>
-            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.IBAN}</p>
-            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.bankAccount}</p>
-
-
+              <h2 style="color: #1f2937; margin: 0 0 5px 0; font-size: 24px;">عرض سعر</h2>
+              <p style="color: #6b7280; margin: 5px 0; font-size: 16px;">Nebras Al Arab Printer</p>
+              <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">${companyInfo.owner}</p>
             </div>
           </div>
         </div>
-
+  
         <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
           <div>
-            <p style="margin: 5px 0; color: #6b7280;"><strong>رقم العرض:</strong> ${
-              invoiceData.invoiceNumber
-            }</p>
-            <p style="margin: 5px 0; color: #6b7280;"><strong>التاريخ:</strong> ${
-              invoiceData.date
-            }</p>
-
-           <p style="margin: 5px 0;"><strong>الراجحي</strong> ${companyInfo.bankAccount}</p>
-           <p style="margin: 5px 0;"><strong>IBAN</strong> ${companyInfo.IBAN}</p>
-
-
-
+            <p style="margin: 5px 0; color: #6b7280;"><strong>رقم العرض:</strong> ${invoiceData.invoiceNumber}</p>
+            <p style="margin: 5px 0; color: #6b7280;"><strong>التاريخ:</strong> ${invoiceData.date}</p>
+            <p style="margin: 5px 0;"><strong>الراجحي:</strong> 129608010999395</p>
+            <p style="margin: 5px 0;"><strong>IBAN:</strong> SA5480000129608010999395</p>
           </div>
           <div style="text-align: right;">
             <h3 style="color: #1f2937; margin: 0 0 10px 0;">معلومات العميل</h3>
             <p style="margin: 5px 0; color: #6b7280;"><strong>الاسم:</strong> ${
               invoiceData.customerName || customerName || "غير محدد"
             }</p>
-       
             <p style="margin: 5px 0; color: #6b7280;"><strong>الهاتف:</strong> ${
               invoiceData.customerPhone || "غير محدد"
             }</p>
-         
           </div>
         </div>
-
+  
         <div style="margin-bottom: 20px;">
           <h3 style="color: #1f2937; margin: 0 0 15px 0;">المنتجات</h3>
           <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
@@ -473,47 +645,34 @@ ${invoiceData.items
             </tbody>
           </table>
         </div>
-
+  
         <div style="text-align: left; margin-bottom: 20px;">
           <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <span style="color: #6b7280;">المجموع الفرعي:</span>
-              <span style="color: #1f2937; font-weight: bold;">${calculateSubtotal().toFixed(
-                2
-              )} ريال</span>
+              <span style="color: #1f2937; font-weight: bold;">${calculateSubtotal().toFixed(2)} ريال</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <span style="color: #6b7280;">الخصم:</span>
-              <span style="color: #1f2937; font-weight: bold;">-${calculateDiscountAmount().toFixed(
-                2
-              )} ريال</span>
+              <span style="color: #1f2937; font-weight: bold;">-${calculateDiscountAmount().toFixed(2)} ريال</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <span style="color: #6b7280;">المجموع قبل الضريبة:</span>
-              <span style="color: #1f2937; font-weight: bold;">${calculateTaxableAmount().toFixed(
-                2
-              )} ريال</span>
+              <span style="color: #1f2937; font-weight: bold;">${calculateTaxableAmount().toFixed(2)} ريال</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <span style="color: #6b7280;">الضريبة (15%):</span>
-              <span style="color: #1f2937; font-weight: bold;">${calculateTax().toFixed(
-                2
-              )} ريال</span>
+              <span style="color: #1f2937; font-weight: bold;">${calculateTax().toFixed(2)} ريال</span>
             </div>
             <div style="display: flex; justify-content: space-between; border-top: 1px solid #e5e7eb; padding-top: 10px;">
               <span style="color: #1f2937; font-weight: bold; font-size: 18px;">الإجمالي:</span>
-              <span style="color: #10b981; font-weight: bold; font-size: 18px;">${calculateTotal().toFixed(
-                2
-              )} ريال</span>
+              <span style="color: #10b981; font-weight: bold; font-size: 18px;">${calculateTotal().toFixed(2)} ريال</span>
             </div>
           </div>
         </div>
-
-        
       </div>
     `;
-
-    // Create a new window with the invoice content
+  
     const printWindow = window.open("", "_blank");
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -545,6 +704,7 @@ ${invoiceData.items
     `);
     printWindow.document.close();
   };
+  
 
   const handleLike = () => {
     const newLikes = isLiked ? likes - 1 : likes + 1;
