@@ -588,6 +588,8 @@ const billText =
               <h2 style="color: #1f2937; margin: 0 0 5px 0; font-size: 24px;">عرض سعر</h2>
               <p style="color: #6b7280; margin: 5px 0; font-size: 16px;">Nebras Al Arab Printer</p>
               <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">${companyInfo.owner}</p>
+              <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">${companyInfo.phone}</p>
+
             </div>
           </div>
         </div>
