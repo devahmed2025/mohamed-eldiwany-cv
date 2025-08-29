@@ -25,7 +25,7 @@ export default function BillingPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [customerName, setCustomerName] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
+  // const [customerAddress, setCustomerAddress] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(true);
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
@@ -99,9 +99,9 @@ export default function BillingPage() {
     invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
     date: new Date().toISOString().split("T")[0],
     customerName: "",
-    customerAddress: "",
+    // customerAddress: "",
     customerPhone: "",
-    customerEmail: "",
+    // customerEmail: "",
     items: [
       {
         id: 1,
@@ -122,7 +122,8 @@ export default function BillingPage() {
     email: "dewany1979@gmail.com",
     address: "الرياض، المملكة العربية السعودية",
     website: "www.nebras-alarab.com",
-    bankAccount: "SA12 3456 7890 1234 5678 9012",
+    bankAccount: "129608010999395",
+    IBAN: "SA548 0000 129608010999395",
   });
 
   // Check authentication on component mount
@@ -142,7 +143,7 @@ export default function BillingPage() {
           setShowLoginModal(false);
           setUsername(authData.username);
           setCustomerName(authData.customerName || "");
-          setCustomerAddress(authData.customerAddress || "");
+          // setCustomerAddress(authData.customerAddress || "");
         }
       } else {
         // Session expired, clear storage
@@ -196,7 +197,7 @@ export default function BillingPage() {
       const authData = {
         username,
         customerName,
-        customerAddress,
+        // customerAddress,
       };
       localStorage.setItem("billingAuth", JSON.stringify(authData));
       localStorage.setItem("lastLogin", new Date().toISOString());
@@ -239,11 +240,11 @@ export default function BillingPage() {
     const authData = {
       username,
       customerName,
-      customerAddress,
+      // customerAddress,
     };
     localStorage.setItem("billingAuth", JSON.stringify(authData));
     localStorage.setItem("customerName", customerName);
-    localStorage.setItem("customerAddress", customerAddress);
+    // localStorage.setItem("customerAddress", customerAddress);
     setShowCustomerModal(false);
   };
 
@@ -355,7 +356,7 @@ export default function BillingPage() {
     const message = `مرحباً، أريد عرض سعر من مطابع نبراس العرب
     
 اسم العميل: ${customerName || "غير محدد"}
-العنوان: ${customerAddress || "غير محدد"}
+
 
 تفاصيل الطلب:
 ${invoiceData.items
@@ -401,6 +402,10 @@ ${invoiceData.items
             <h2 style="color: #1f2937; margin: 0 0 5px 0; font-size: 24px;">عرض سعر</h2>
             <p style="color: #6b7280; margin: 5px 0; font-size: 16px;">Nebras Al Arab Printer</p>
             <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.owner}</p>
+            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.IBAN}</p>
+            <p style="color: #6b7280; margin: 5px 0; font-size: 14px;">  ${companyInfo.bankAccount}</p>
+
+
             </div>
           </div>
         </div>
@@ -414,7 +419,9 @@ ${invoiceData.items
               invoiceData.date
             }</p>
 
-           <p style="margin: 5px 0;"><strong>رقم الحساب البنكي:</strong> ${companyInfo.bankAccount}</p>
+           <p style="margin: 5px 0;"><strong>الراجحي</strong> ${companyInfo.bankAccount}</p>
+           <p style="margin: 5px 0;"><strong>IBAN</strong> ${companyInfo.IBAN}</p>
+
 
 
           </div>
@@ -423,15 +430,11 @@ ${invoiceData.items
             <p style="margin: 5px 0; color: #6b7280;"><strong>الاسم:</strong> ${
               invoiceData.customerName || customerName || "غير محدد"
             }</p>
-            <p style="margin: 5px 0; color: #6b7280;"><strong>العنوان:</strong> ${
-              invoiceData.customerAddress || customerAddress || "غير محدد"
-            }</p>
+       
             <p style="margin: 5px 0; color: #6b7280;"><strong>الهاتف:</strong> ${
               invoiceData.customerPhone || "غير محدد"
             }</p>
-            <p style="margin: 5px 0; color: #6b7280;"><strong>البريد:</strong> ${
-              invoiceData.customerEmail || "غير محدد"
-            }</p>
+         
           </div>
         </div>
 
@@ -892,21 +895,8 @@ ${invoiceData.items
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        العنوان
-                      </label>
-                      <textarea
-                        value={invoiceData.customerAddress}
-                        onChange={(e) =>
-                          setInvoiceData((prev) => ({
-                            ...prev,
-                            customerAddress: e.target.value,
-                          }))
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800 bg-white"
-                        placeholder="أدخل عنوان العميل"
-                        rows={2}
-                      />
+             
+               
                     </div>
                   </div>
                 </div>
@@ -1262,16 +1252,8 @@ ${invoiceData.items
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  عنوان العميل
-                </label>
-                <input
-                  type="text"
-                  value={customerAddress}
-                  onChange={(e) => setCustomerAddress(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-800 bg-white"
-                  placeholder="أدخل عنوان العميل"
-                />
+           
+        
               </div>
             </div>
             <button
