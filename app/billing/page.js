@@ -189,7 +189,7 @@ export default function BillingPage() {
       return;
     }
 
-    if (username === "dewany" && password === "dewany123") {
+    if (username === "dewany" && password === "dewany12345") {
       setIsAuthenticated(true);
       setShowLoginModal(false);
       setLoginAttempts(0);
