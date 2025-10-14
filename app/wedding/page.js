@@ -201,15 +201,15 @@ export default function ContractGenerator() {
             width: 120px;
             height: 120px;
             margin: 0 auto 15px;
-            border: 4px solid ${pdfSettings.accentColor};
-            border-radius: 50%;
+            // border: 4px solid ${pdfSettings.accentColor};
+            // border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, ${pdfSettings.accentColor}22 0%, ${pdfSettings.accentColor}44 100%);
+            // background: linear-gradient(135deg, ${pdfSettings.accentColor}22 0%, ${pdfSettings.accentColor}44 100%);
             font-size: 30px;
             font-weight: 900;
-            color: ${pdfSettings.accentColor};
+            // color: ${pdfSettings.accentColor};
           }
           
           .company-title {
@@ -501,7 +501,15 @@ export default function ContractGenerator() {
       <body>
         <div class="contract-page">
           <div class="header-section">
-            <div class="company-logo">جاء</div>
+            <div class="company-logo">
+<img 
+  src="https://res.cloudinary.com/djzcvjwuv/image/upload/v1760477941/WhatsApp_Image_2025-10-15_at_12.38.46_AM_xvxabx.jpg" 
+  alt="شعار المؤسسة" 
+  style="width:200px;height:200px;object-fit:cover;border-radius:12px;display:block;margin:0 auto;"
+/>
+
+
+            </div>
             <h1 class="company-title">مؤسسة جاء للاحتفالات والمناسبات</h1>
             <p class="company-subtitle">بالتعاون مع نوفتيل العنود</p>
             <div class="header-info">
@@ -511,10 +519,15 @@ export default function ContractGenerator() {
             </div>
           </div>
 
-          <h1 class="contract-title">⚖️ العـــقــــد ⚖️</h1>
+          <h1 class="contract-title">⚖️ العـــقــــد ⚖️
+            </h1>
+        
 
           <div class="intro-text">
+          <h6><strong>تتقدم مؤسسة جوابا للمناسبات بالتعاون مع نوفتيل العنود</strong></h6>
+  <div class="contract-section">
             <p><strong>بعد إقرار كل من الطرفين بأهليته المعتبرة شرعاً وقانوناً للتعاقد</strong></p>
+            </div>
             <p><strong>فقد اتفق الطرفان على ما يلي:</strong></p>
           </div>
 
@@ -943,7 +956,15 @@ export default function ContractGenerator() {
       <body>
         <div class="contract-page">
           <div class="header-section">
-            <div class="logo-placeholder">شعار المؤسسة (صورة وهمية)</div>
+                       <div class="company-logo">
+<img 
+  src="https://res.cloudinary.com/djzcvjwuv/image/upload/v1760477941/WhatsApp_Image_2025-10-15_at_12.38.46_AM_xvxabx.jpg" 
+  alt="شعار المؤسسة" 
+  style="width:200px;height:200px;object-fit:cover;border-radius:12px;display:block;margin:0 auto;"
+/>
+
+
+            </div>
             <h1 class="company-title">مؤسسة جاء للاحتفالات والمناسبات</h1>
             <p class="company-subtitle">السجل التجاري: 1010765704 | هاتف: 0501854427</p>
             <div class="header-info">
@@ -1232,7 +1253,15 @@ export default function ContractGenerator() {
       </head>
       <body>
         <div class="invitation-card">
-          <div class="logo">مؤسسة جاء</div>
+                 <div class="company-logo">
+<img 
+  src="https://res.cloudinary.com/djzcvjwuv/image/upload/v1760477941/WhatsApp_Image_2025-10-15_at_12.38.46_AM_xvxabx.jpg" 
+  alt="شعار المؤسسة" 
+  style="width:200px;height:200px;object-fit:cover;border-radius:12px;display:block;margin:0 auto;"
+/>
+
+
+            </div>
           <h1 class="main-title">يسرنا دعوتكم</h1>
           <p class="sub-title">لحضور حفل ${invitationEventType} المبارك</p>
           
