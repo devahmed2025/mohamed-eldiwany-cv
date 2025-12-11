@@ -1,3 +1,5 @@
+
+
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -1450,14 +1452,14 @@ export default function PersonalTrainerApp() {
             <div className="relative z-10 flex min-h-screen">
                 
                 {/* Sidebar (Fixed width for desktop, toggled for mobile) */}
-                <aside 
-                    className={`fixed md:sticky top-0 h-screen w-64 bg-gray-800/95 border-e border-gray-700 shadow-xl p-4 transition-transform duration-300 z-30 ${showSidebar ? 'transform translate-x-0' : 'transform translate-x-full md:translate-x-0'}`}
-                >
+             <aside 
+    className="fixed top-0 h-screen w-64 bg-gray-800/95 border-e border-gray-700 shadow-xl p-4 z-30 hidden md:block"
+>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-xl font-bold text-indigo-400">{T.plans}</h3>
-                        <button onClick={() => setShowSidebar(false)} className="md:hidden text-gray-400 hover:text-white">
-                            <X className="w-6 h-6" />
-                        </button>
+                      <button onClick={() => setShowSidebar(false)} className="md:hidden text-gray-400 hover:text-white">
+    <X className="w-6 h-6" />
+</button>
                     </div>
                     
                     <button 
