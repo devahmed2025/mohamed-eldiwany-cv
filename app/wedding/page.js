@@ -1110,7 +1110,7 @@ export default function PersonalTrainerApp() {
                 </h2>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">اسم المستخدم (amr)</label>
+                        <label className="block text-sm font-medium text-gray-700">اسم المستخدم </label>
                         <input 
                             type="text" 
                             value={username} 
@@ -1119,7 +1119,7 @@ export default function PersonalTrainerApp() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">كلمة المرور (amr123)</label>
+                        <label className="block text-sm font-medium text-gray-700">كلمة المرور</label>
                         <input 
                             type="password" 
                             value={password} 
@@ -1642,3 +1642,4 @@ export default function PersonalTrainerApp() {
     </div>
   );
 }
+
