@@ -3788,7 +3788,7 @@ const T = {
     newPlan: "خطة جديدة", edit: "تعديل", delete: "حذف", usageDays: "أيام الاستخدام:",
     dosage: "الجرعة", timing: "التوقيت",
     mealNames: { 
-        breakfast: 'وجبة الإفطار', lunch: 'وجبة الغداء', dinner: 'وجبة العشاء', snacks: 'الوجبات الخفيفة' 
+        breakfast: 'وجبة الإفطار', lunch: 'وجبة الغداء', dinner: 'وجبة العشاء', snacks: 'الوجبات الاضافية' 
     },
     trainerTitle: "Coach Amr ELshahhat",
     coverTitle: "Plan For",
@@ -5760,4 +5760,5 @@ Wich you the best                                </p>
         </div>
     );
 }
+
 
